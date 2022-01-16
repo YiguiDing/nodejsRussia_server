@@ -1,5 +1,5 @@
 // const host = "127.0.0.1";
-const hostname = "hostname.ltd";
+const hostname = "0.0.0.0";
 const port = 54321;
 const historyScoreFilePath=process.cwd()+"/data/historyScore.json";//保存了要发给客户端的数据
 const historyScoreTempFilePath=process.cwd()+"/data/historyScoreTemp.json";//保存了从客户端记录的所有数据
