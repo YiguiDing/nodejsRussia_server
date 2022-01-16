@@ -109,16 +109,10 @@ function processReceiveWsMessage(data,isBinary)//处理从客户端收到的消�
             fs.writeFileSync(historyScoreFilePath,JSON.stringify(LocalDatajsOBJ));//将结果写入文件
             fs.writeFileSync(historyScoreTempFilePath,JSON.stringify(LocalTempDatajsOBJ));//将结果写入文件
             console.log(fs.readFileSync(historyScoreFilePath).toString());//本地结果
-            // jsOBJ["data"][]
-            // var historyScoreList=fs.readFileSync(historyScoreFilePath).toString();
-            // this.send(sendDataString);
-            // console.log(typeof fs.readFileSync(historyScoreFilePath));//object
-            // console.log(fs.readFileSync(historyScoreFilePath));//byte字节数据
-            // console.log(fs.readFileSync(historyScoreFilePath).toString());//字符串数据
-            // console.log(LocalDatajsOBJ[clientMode]);//排序后的结果，将会多一项
-            // console.log(LocalDatajsOBJ[clientMode]);//结果
 
-
+            //写入本地之后广播所有人
+            var sendDataString=fs.readFileSync(historyScoreFilePath).toString();
+            boradcastMessage(sendDataString);
         }
     }catch(err)
     {
