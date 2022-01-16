@@ -1,49 +1,39 @@
-// const host = "127.0.0.1";
+const protocol = "http://"
 const hostname = "0.0.0.0";
 const port = 54321;
+
+const default_listCount=12;//排名记录前12
 const historyScoreFilePath=process.cwd()+"/data/historyScore.json";//保存了要发给客户端的数据
 const historyScoreTempFilePath=process.cwd()+"/data/historyScoreTemp.json";//保存了从客户端记录的所有数据
-const default_listCount=12;//排名记录前12
 
-//使用ws模块创建wss服务器:
-var https=require('https');
+//使用ws模块创建ws服务器:
+var http=require('http');
 var ws=require('ws');
 var fs=require('fs');
-const { send } = require('process');
 
-var keypath=process.cwd()+'/Key/scs1642181627610_hostname.ltd_server.key';//私钥 console.log(keypath);
-var certpath=process.cwd()+'/Key/scs1642181627610_hostname.ltd_server.crt';//证书 console.log(certpath);
-
-var httpsOptions = {
-  key:  fs.readFileSync(keypath),
-  cert: fs.readFileSync(certpath),
-  //passphrase:'1234'//如果秘钥文件有密码的话，用这个属性设置密码
-};
-var httpsServer=https.createServer(httpsOptions, function (req, res) {//对直接访问https服务403禁止
+var httpServer=http.createServer(function (req, res) {//禁止页面访问
     res.writeHead(403);//禁止访问网页 200成功 403禁止
     res.end("This is a  WebSockets server!\n");
 });
-httpsServer.listen(port,hostname,()=>{
-    console.log('Server running at https://'+ hostname + ':' + port + '/')
+httpServer.listen(port,hostname,()=>{
+    console.log('Server running at ' + protocol + hostname + ':' + port + '/')
 });
 
-var WSSoption={
-    // host:hostname,
-    // port:port,
-    server: httpsServer,//把创建好的https服务器丢进websocket的创建函数里，ws会用这个服务器来创建wss服务//如果丢进去的是个http服务的话那么创建出来的还是无加密的ws服务
+var WSoption={
+    server: httpServer,//丢进去的是个http服务 创建出无加密的ws服务
     clientTracking:true,
 }
-var wss = new ws.Server(WSSoption,()=>{
-    console.log("wss服务创建成功~");
+var ws = new ws.Server(WSoption,()=>{
+    console.log("ws服务创建成功~");
 });
 
 var CLIENTS=[];//用于广播消息
-wss.on( 'connection', processClientEvents);             
+ws.on( 'connection', processClientEvents);             
 
 function processClientEvents(socket,request)                //对单个ws会话连接的处理程序
 {
     CLIENTS.push(socket);
-    console.log("与新用户建立了连接,当前连接数:" + wss.clients.size);
+    console.log("与新用户建立了连接,当前连接数:" + ws.clients.size);
     // console.log("会话ID(sessionIdContext):"+ socket["_socket"]["server"]["sessionIdContext"]);
 
     socket.on( 'message', processReceiveWsMessage);         //绑定收到消息后执行的操作
