@@ -11,6 +11,10 @@ var http=require('http');
 var ws=require('ws');
 var fs=require('fs');
 
+//铭感词检测模块
+var WordDetect = require('./WordDetect');
+var WD=new WordDetect();
+
 var httpServer=http.createServer(function (req, res) {//禁止页面访问
     res.writeHead(403);//禁止访问网页 200成功 403禁止
     res.end("This is a  WebSockets server!\n");
@@ -34,8 +38,9 @@ function processClientEvents(socket,request)                //对单个ws会话�
 {
     CLIENTS.push(socket);
     console.log("与新用户建立了连接,当前连接数:" + ws.clients.size);
-    // console.log("会话ID(sessionIdContext):"+ socket["_socket"]["server"]["sessionIdContext"]);
-
+    //建立连接后就直接向客户端发送数据
+    var sendDataString=fs.readFileSync(historyScoreFilePath).toString();
+    socket.send(sendDataString);
     socket.on( 'message', processReceiveWsMessage);         //绑定收到消息后执行的操作
     socket.on( 'close' ,  processWsCloseEvent);             //绑定断开连接后执行的操作
 
@@ -85,6 +90,9 @@ function processReceiveWsMessage(data,isBinary)//处理从客户端收到的消�
 
             if(clientMode!="经典模式" && clientMode!="加速模式" && clientMode!="困难模式" && clientMode!="限时模式")
                 return;//如果不是这几种模式就不处理
+            if(WD.haveSensitiveWord(clientName)||WD.haveNumber(clientName))
+                return;//如果名字包含敏感关键字或者有数字就不处理
+                
             var LocalDatajsOBJ=JSON.parse(fs.readFileSync(historyScoreFilePath).toString())//将本地数据抽象为js对象
             var LocalTempDatajsOBJ=JSON.parse(fs.readFileSync(historyScoreTempFilePath).toString())//将另一个本地数据抽象为js对象
             
@@ -111,6 +119,7 @@ function processReceiveWsMessage(data,isBinary)//处理从客户端收到的消�
             console.log(fs.readFileSync(historyScoreFilePath).toString());//本地结果
 
             //写入本地之后广播所有人
+            console.log("向客户端广播更新后的数据。");
             var sendDataString=fs.readFileSync(historyScoreFilePath).toString();
             boradcastMessage(sendDataString);
         }
