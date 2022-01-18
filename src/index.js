@@ -19,6 +19,17 @@ var httpServer=http.createServer(function (req, res) {//禁止页面访问
     res.writeHead(403);//禁止访问网页 200成功 403禁止
     res.end("This is a  WebSockets server!\n");
 });
+process.on('uncaughtException', err => {//捕捉未处理的报错
+    console.log('uncaughtException err:')
+    console.error(err && err.stack)
+    fs.writeFile(errLogFilePath,err,function(err){
+        if(err)
+            console.log("记录出错日志失败");
+        else
+            console.log("记录出错日志成功");
+
+    });
+});
 httpServer.listen(port,hostname,()=>{
     console.log('Server running at ' + protocol + hostname + ':' + port + '/')
 });

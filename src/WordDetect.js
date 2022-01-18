@@ -2,7 +2,7 @@ module.exports=function(){
     var WordsLIB=[
         "sb","傻逼","沙比","啥比",'萨比',"撒币","洒币",
         "狗","猪","dog",
-        "儿子","爸爸","son","Son","parent","Parent","mother","Mother","妈","尼玛",
+        "儿子","爸爸","爹","son","Son","parent","Parent","mother","Mother","妈","尼玛",
         "fuck","Fuck","操","死",
         "贱",
         "逼",'批',"批",
